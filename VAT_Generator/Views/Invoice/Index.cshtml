@@ -1,0 +1,45 @@
+﻿@model IEnumerable<VAT_Generator.Models.Invoice>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Lista faktur</h2>
+
+<p>
+    @Html.ActionLink("Nowa faktura", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th style="min-width:83px">
+            Nr faktury
+        </th>
+        <th style="min-width: 132px;">
+            Data wystawienia
+        </th>
+        <th style="width: 100%">
+            Kupujący
+        </th>
+        <th style="min-width: 260px;"></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td align="right">
+            @Html.DisplayFor(modelItem => item.InvoiceId)
+        </td>
+        <td>
+            @item.CreationDate.Date.ToString("dd.MM.yyyy")
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CustomerName)
+        </td>
+        <td>
+            @Html.ActionLink("Edytuj listę produktów", "EditProducts", new { id = item.InvoiceId }) |
+            @Html.ActionLink("Podgląd", "Details", new { id = item.InvoiceId }) |
+            @Html.ActionLink("Usuń", "Delete", new { id = item.InvoiceId })
+        </td>
+    </tr>
+}
+
+</table>

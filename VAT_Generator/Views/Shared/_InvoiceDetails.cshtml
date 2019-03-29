@@ -1,0 +1,168 @@
+﻿@model VAT_Generator.Models.Invoice
+
+<head>
+    @Styles.Render("~/Content/css")
+    <style>
+        #Seller {
+            float: left;
+            max-width: 500px;
+            margin: 0 50px 10px 10px;
+        }
+
+        #Customer {
+            max-width: 500px;
+            margin: 10px;
+        }
+
+        .tableVat {
+            margin: 20px 0;
+            /*width: 100%;*/
+        }
+
+            .tableVat td {
+                padding: 5px 10px;
+            }
+
+            .tableVat th {
+                padding: 5px 10px;
+            }
+
+            .tableVat tr {
+                border-bottom: solid 1px rgb(160, 160, 160);
+            }
+
+        #tableSummary {
+            margin-top: 40px;
+            /*position: absolute;
+            right: 0;*/
+        }
+    </style>
+</head>
+
+<h3 style="margin: 30px 10px">Faktura VAT nr @Model.InvoiceId</h3>
+<h4 style="margin: 30px 10px">Data wystawienia: @Model.CreationDate.ToShortDateString()</h4>
+<body>
+    <div id="Seller">
+        <label>Sprzedawca</label>
+        <div>FAKTUREX Bartłomiej Bogusz</div>
+        <div>Orzycka 123, 99-999 Warszawa</div>
+        <div>NIP: 123456789</div>
+    </div>
+    <div id="Customer">
+        <label>Kupujący</label>
+        <div>@Model.CustomerName</div>
+        <div>@Model.Address</div>
+        <div>NIP: @Model.NIP</div>
+    </div>
+    <div>
+        <table class="tableVat">
+            <tr style="background-color: rgb(220, 220, 220)">
+                <th>
+                    Lp
+                </th>
+                <th>
+                    Nazwa towaru
+                </th>
+                <th>
+                    Cena netto [zł]
+                </th>
+                <th>
+                    Ilość
+                </th>
+                <th>
+                    Wartość netto [zł]
+                </th>
+                <th>
+                    Vat [%]
+                </th>
+                <th>
+                    Wartość VAT [zł]
+                </th>
+                <th>
+                    Wartość brutto [zł]
+                </th>
+            </tr>
+
+            @for (int i = 0; i < Model.ProductQuantities.Count; i++)
+            {
+                <tr>
+                    <td align="right">
+                        @(i + 1)
+                    </td>
+                    <td>
+                        @(Model.ProductQuantities[i].Product.Name.Length > 70 ? Model.ProductQuantities[i].Product.Name.Substring(0, 70) : Model.ProductQuantities[i].Product.Name)
+                    </td>
+                    <td align="right">
+                        @Model.ProductQuantities[i].Product.NetPrice
+                    </td>
+                    <td align="right">
+                        @Model.ProductQuantities[i].Quantity
+                    </td>
+                    <td align="right">
+                        @decimal.Round((Model.ProductQuantities[i].Product.NetPrice * Model.ProductQuantities[i].Quantity), 2)
+                    </td>
+                    <td align="right">
+                        @(Model.ProductQuantities[i].Product.TaxRate * 100)%
+                    </td>
+                    <td align="right">
+                        @decimal.Round((Model.ProductQuantities[i].Product.NetPrice * Model.ProductQuantities[i].Quantity * Model.ProductQuantities[i].Product.TaxRate), 2)
+                    </td>
+                    <td align="right">
+                        @decimal.Round((Model.ProductQuantities[i].Product.NetPrice * Model.ProductQuantities[i].Quantity * (1 + Model.ProductQuantities[i].Product.TaxRate)), 2)
+                    </td>
+                </tr>
+            }
+
+        </table>
+
+        <table id="tableSummary" class="tableVat">
+            <tr style="background-color: rgb(220, 220, 220)">
+                <th>
+                    Wartość netto [zł]
+                </th>
+                <th>
+                    VAT [%]
+                </th>
+                <th>
+                    Wartość VAT [zł]
+                </th>
+                <th>
+                    Wartość brutto [zł]
+                </th>
+            </tr>
+
+            @foreach (decimal taxRate in Model.ProductQuantities.Select(q => q.Product.TaxRate).Distinct())
+            {
+                <tr>
+                    <td align="right">
+                        @decimal.Round((Model.ProductQuantities.Where(q => q.Product.TaxRate == taxRate).Sum(q => q.Product.NetPrice * q.Quantity)), 2)
+                    </td>
+                    <td align="right">
+                        @taxRate
+                    </td>
+                    <td align="right">
+                        @decimal.Round((Model.ProductQuantities.Where(q => q.Product.TaxRate == taxRate).Sum(q => q.Product.TaxValue * q.Quantity)), 2)
+                    </td>
+                    <td align="right">
+                        @decimal.Round((Model.ProductQuantities.Where(q => q.Product.TaxRate == taxRate).Sum(q => (q.Product.NetPrice + q.Product.TaxValue) * q.Quantity)), 2)
+                    </td>
+                </tr>
+            }
+
+            <tr style="background-color: red">
+                <td align="right">
+                    @(Model.ProductQuantities.Sum(q => q.Product.NetPrice * q.Quantity))
+                </td>
+                <td align="right">
+                    -
+                </td>
+                <td align="right">
+                    @(Model.ProductQuantities.Sum(q => q.Product.TaxValue * q.Quantity))
+                </td>
+                <td align="right">
+                    @(Model.ProductQuantities.Sum(q => (q.Product.NetPrice + q.Product.TaxValue) * q.Quantity))
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>

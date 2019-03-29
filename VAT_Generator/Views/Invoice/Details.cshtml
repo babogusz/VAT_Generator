@@ -1,0 +1,13 @@
+﻿@model VAT_Generator.Models.Invoice
+@{
+    ViewBag.Title = "Details";
+}
+
+
+@Html.Partial("_InvoiceDetails", Model)
+
+@Html.ActionLink("Pobierz jako PDF", "SaveAsPdf", new { id = Model.InvoiceId }, new { target = "_blank" })
+
+<div style="margin: 20px 0 0 0">
+    @Html.ActionLink("Powrót do listy", "Index")
+</div>

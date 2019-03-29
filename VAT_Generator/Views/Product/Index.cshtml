@@ -1,0 +1,69 @@
+﻿@model IEnumerable<VAT_Generator.Models.Product>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @*@Html.ActionLink("Create New", "Create")*@
+
+    @*@Html.ActionLink("Nowa Faktura", "CreateInvoice")*@
+</p>
+<table class="table"
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NetPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TaxRate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TaxValue)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GrossPrice)
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NetPrice)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TaxRate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TaxValue)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.GrossPrice)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                    @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                    @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                </td>
+            </tr>
+        
+        @*<td><input type="submit" value="Faktura"></td>*@
+        @*<td>@Html.ActionLink("Nowa Faktura", "CreateInvoice", Model))</td>*@
+    }
+
+</table>

@@ -1,0 +1,43 @@
+﻿@model IEnumerable<VAT_Generator.Models.ProductQuantityViewModel>
+
+@{
+    ViewBag.Title = "EditProducts";
+}
+
+<head>
+    <style>
+        #AppluBtn {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<h2>Edycja listy produktów - faktura @ViewData["InvoiceId"]</h2>
+
+@using (Html.BeginForm("AddProducts", "Invoice", new { invoiceId = ViewData["InvoiceId"] }, FormMethod.Post))
+{
+    <table class="table">
+        <tr>
+            <th style="display: none"></th>
+            <th>Nazwa produktu</th>
+            <th>Cena netto [zł]</th>
+            <th>Cena brutto [zł]</th>
+            <th>Ilość</th>
+        </tr>
+        @foreach (VAT_Generator.Models.ProductQuantityViewModel item in Model)
+        {
+            <tr>
+                <td style="display: none"><input type="hidden" value="@item.Product.ProductId" name="id" /></td>
+                <td>@item.Product.NetPrice</td>
+                <td>@item.Product.GrossPrice</td>
+                <td>@item.Product.Name</td>
+                <td><input type="number" name="quantity" value="@(@item.ProductQuantity != null ? @item.ProductQuantity.Quantity : 0)" min="0" /></td>
+            </tr>
+        }
+    </table>
+
+    <button id="AppluBtn" type="submit">
+        Zatwierdź
+    </button>
+}
+
