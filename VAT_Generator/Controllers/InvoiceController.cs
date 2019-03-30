@@ -38,7 +38,7 @@ namespace VAT_Generator.Controllers
 
         public ActionResult Delete(int id)
         {
-            WebApiUtils.WebApiClient.DeleteAsync("Invoice/" + id);
+            HttpResponseMessage response = WebApiUtils.WebApiClient.DeleteAsync("Invoice/" + id).Result;
 
             return RedirectToAction("Index");
         }
@@ -107,12 +107,12 @@ namespace VAT_Generator.Controllers
                                 productQuantity.ProductId = product.ProductId;
                                 productQuantity.Quantity = quantity;
                                 productQuantity.InvoiceId = invoice.InvoiceId;
-                                HttpResponseMessage response = WebApiUtils.WebApiClient.PostAsJsonAsync("ProductQuantity", productQuantity).Result;
+                                WebApiUtils.WebApiClient.PostAsJsonAsync("ProductQuantity", productQuantity);
                             }
                             else
                             {
                                 productQuantity.Quantity = quantity;
-                                HttpResponseMessage response = WebApiUtils.WebApiClient.PutAsJsonAsync("ProductQuantity/" + productQuantity.ProductQuantityId, productQuantity).Result;
+                                WebApiUtils.WebApiClient.PutAsJsonAsync("ProductQuantity/" + productQuantity.ProductQuantityId, productQuantity);
                             }
                         }
                     }
@@ -120,7 +120,9 @@ namespace VAT_Generator.Controllers
                     {
                         productQuantity = productQuantities.Where(q => q.ProductId == ID).FirstOrDefault();
                         if (productQuantity != null)
-                            WebApiUtils.WebApiClient.DeleteAsync("ProductQuantity/" + productQuantity.ProductQuantityId);
+                        {
+                            HttpResponseMessage response = WebApiUtils.WebApiClient.DeleteAsync("ProductQuantity/" + productQuantity.ProductQuantityId).Result;
+                        }
                     }
                 }
 

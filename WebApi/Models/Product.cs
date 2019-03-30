@@ -11,11 +11,17 @@ namespace WebApi.Models
     public class Product
     {
         [Key]
+        [Required]
         public int ProductId { get; set; }
+        [Required]
         public string Name { get; set; }
+        [Required]
         public decimal NetPrice { get; set; }
-        public decimal TaxRate { get; set; }
+        [Required]
+        public int TaxRate { get; set; }
+        [Required]
         public decimal TaxValue { get; set; }
+        [Required]
         public decimal GrossPrice { get; set; }
     }
 }

@@ -1,15 +1,13 @@
 ﻿@model IEnumerable<VAT_Generator.Models.Product>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Lista produktów";
 }
 
 <h2>Index</h2>
 
 <p>
-    @*@Html.ActionLink("Create New", "Create")*@
-
-    @*@Html.ActionLink("Nowa Faktura", "CreateInvoice")*@
+    @Html.ActionLink("Dodaj produkt", "Create")
 </p>
 <table class="table"
         <tr>
@@ -47,7 +45,7 @@
                     @Html.DisplayFor(modelItem => item.NetPrice)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.TaxRate)
+                    @Html.DisplayFor(modelItem => (item.TaxRate))
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.TaxValue)
@@ -56,9 +54,8 @@
                     @Html.DisplayFor(modelItem => item.GrossPrice)
                 </td>
                 <td>
-                    @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                    @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                    @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                    @Html.ActionLink("Edytuj", "Edit", new { id = item.ProductId }) |
+                    @Html.ActionLink("Usuń", "Delete", new { id = item.ProductId })
                 </td>
             </tr>
         

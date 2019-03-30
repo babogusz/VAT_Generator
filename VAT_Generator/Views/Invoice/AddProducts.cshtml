@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<VAT_Generator.Models.Product>
 @{ ViewBag.Title = "AddProducts"; }
 
-<h2>Edycja listy produktów - faktura @ViewData["InvoiceId"]</h2>
+<h2>Lista produktów - faktura nr @ViewData["InvoiceId"]</h2>
 
 @using (Html.BeginForm("AddProducts", "Invoice", new { invoiceId = ViewData["InvoiceId"] }, FormMethod.Post))
 {

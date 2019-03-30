@@ -39,6 +39,9 @@ namespace WebApi.Controllers
         [ResponseType(typeof(void))]
         public IHttpActionResult PutProduct(int id, Product product)
         {
+            product.TaxValue = product.NetPrice * product.TaxRate * 0.01M;
+            product.GrossPrice = product.NetPrice + product.TaxValue;
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -74,6 +77,9 @@ namespace WebApi.Controllers
         [ResponseType(typeof(Product))]
         public IHttpActionResult PostProduct(Product product)
         {
+            product.TaxValue = product.NetPrice * product.TaxRate * 0.01M;
+            product.GrossPrice = product.NetPrice + product.TaxValue;
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
