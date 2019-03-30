@@ -1,30 +1,166 @@
 ﻿@model IEnumerable<VAT_Generator.Models.Product>
 @{ ViewBag.Title = "AddProducts"; }
 
-<h2>Lista produktów - faktura nr @ViewData["InvoiceId"]</h2>
-
-@using (Html.BeginForm("AddProducts", "Invoice", new { invoiceId = ViewData["InvoiceId"] }, FormMethod.Post))
-{
-    <input type="submit" value="Dodaj" />
-    <table class="table">
-        <tr>
-            <th style="display: none"></th>
-            <th>Nazwa produktu</th>
-            <th>Cena netto [zł]</th>
-            <th>Cena brutto [zł]</th>
-            <th>Ilość</th>
-        </tr>
-        @foreach (VAT_Generator.Models.Product item in Model)
-        {
-
-        <tr>
-            <td style="display: none"><input type="hidden" value="@item.ProductId" name="id" /></td>
-            <td>@item.NetPrice</td>
-            <td>@item.GrossPrice</td>
-            <td>@item.Name</td>
-            <td><input type="number" name="quantity" value="0" min="0"/></td>
-        </tr>
+<head>
+    <style>
+        #AppluBtn {
+            width: 100%;
         }
-    </table>
-}
+    </style>
+</head>
+
+<body>
+    <h2>Lista produktów - faktura nr @ViewData["InvoiceId"]</h2>
+    @using (Html.BeginForm("AddProducts", "Invoice", new { invoiceId = ViewData["InvoiceId"] }, FormMethod.Post))
+    {
+        <table id="tblProducts" class="table">
+            <thead>
+                <tr>
+                    <th style="display: none"></th>
+                    <th>Nazwa produktu</th>
+                    <th>Cena netto [zł]</th>
+                    <th>Cena brutto [zł]</th>
+                    <th>Ilość</th>
+                    <th></th>
+                </tr>
+
+            </thead>
+            <tbody></tbody>
+            <tfoot>
+                <tr>
+                    <td>
+                        @{
+
+                            Dictionary<string, string> dictionaryProducts = new Dictionary<string, string>();
+                            foreach (VAT_Generator.Models.Product item in Model)
+                            {
+                                dictionaryProducts.Add(string.Join(";", new string[] { item.ProductId.ToString(), item.NetPrice.ToString(), item.GrossPrice.ToString() }), item.Name);
+                            }
+
+                            SelectList listProducts = new SelectList(
+                                dictionaryProducts.Select(x => new { Value = x.Key, Text = x.Value }),
+                                "Value",
+                                "Text"
+                                );
+                        }
+
+                        @Html.DropDownList("dropDownProduct", listProducts, "Wybierz produkt", new {
+                            onchange = @"selectionChanged(this);", style="height: 26px"
+                            })
+                    </td>
+                    <td id="lblNetPrice"></td>
+                    <td id="lblGrossPrice"></td>
+                    <td>
+                        <input id="numberQuantity" type="number" min="0" step="1" value="0" />
+                    </td>
+                    <td><input type="button" id="btnAdd" value="Dodaj" /></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <button id="AppluBtn" type="submit">
+            Zatwierdź
+        </button>
+    }
+</body>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+<script type="text/javascript">
+    $("body").on("click", "#btnAdd", function () {
+        let dropDownProduct = $("#dropDownProduct");
+        let numberQuantity = $("#numberQuantity");
+
+        if (dropDownProduct[0].selectedIndex < 1) {
+            alert("Wybierz produkt z listy");
+        }
+        else {
+            if (numberQuantity.val() < 1) {
+                alert("Ilość musi być większa niż 0.");
+            }
+            else {
+                let selectedProduct = dropDownProduct[0].children[dropDownProduct[0].selectedIndex];
+                let productName = selectedProduct.text;
+                let productProps = selectedProduct.value.split(";");
+                let productId = productProps[0];
+                let productNetPrice = productProps[1];
+                let productGrossPrice = productProps[2];
+
+                //Cells
+                let tBody = $("#tblProducts > TBODY")[0];
+                var row = tBody.insertRow(-1);
+
+                let hiddenCell = document.createElement("td");
+                let idInput = document.createElement("input");
+                idInput.type = "hidden";
+                idInput.name = "id";
+                idInput.value = productId;
+                hiddenCell.style.display = "none";
+                hiddenCell.appendChild(idInput);
+                row.appendChild(hiddenCell);
+
+                let cell = $(row.insertCell(-1));
+                cell.html(productName);
+
+                cell = $(row.insertCell());
+                cell.html(productNetPrice);
+
+                cell = $(row.insertCell(-1));
+                cell.html(productGrossPrice);
+
+                cell = $(row.insertCell(-1));
+                let quantityInput = document.createElement("input");
+                quantityInput.type = "number";
+                quantityInput.name = "quantity";
+                quantityInput.min = "0";
+                quantityInput.step = "1";
+                quantityInput.value = numberQuantity.val();
+                cell.append(quantityInput);
+
+                //Add removeButton
+                cell = $(row.insertCell(-1));
+                var btnRemove = $("<input />");
+                btnRemove.attr("type", "button");
+                btnRemove.attr("onclick", "Remove(this);");
+                btnRemove.val("Usuń");
+                cell.append(btnRemove);
+
+                //Clear
+                dropDownProduct[0].selectedIndex = 0;
+                numberQuantity.val(0);
+            }
+        }
+    });
+
+    function Remove(button) {
+        var row = $(button).closest("TR");
+        var name = $("TD", row).eq(1).html();
+        var table = $("#tblProducts")[0];
+        table.deleteRow(row[0].rowIndex);
+    };
+
+    function selectionChanged(selectedProduct) {
+        let dropDownProduct = $("#dropDownProduct");
+
+        if (dropDownProduct[0].selectedIndex < 0) {
+            var productNetPrice = null;
+            var productGrossPrice = null;
+        }
+        else {
+            var productProps = selectedProduct.value.split(";");
+            var productNetPrice = productProps[1];
+            var productGrossPrice = productProps[2];
+        }
+        //Cells
+        let tFooter = $("#tblProducts > TFOOT")[0];
+        let row = tFooter.rows[0];
+
+        let cell = $(row.cells[1]);
+        cell.html(productNetPrice);
+
+        cell = $(row.cells[2]);
+        cell.html(productGrossPrice);
+    }
+</script>
+
 

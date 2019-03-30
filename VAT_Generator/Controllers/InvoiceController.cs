@@ -76,57 +76,60 @@ namespace VAT_Generator.Controllers
         [HttpPost]
         public ActionResult AddProducts(int invoiceId, FormCollection formCollection)
         {
-            string[] ids = formCollection["Id"].Split(',');
-            string[] quantities = formCollection["quantity"].Split(',');
-
-            var resp = WebApiUtils.WebApiClient.GetAsync("Product").Result;
-            var productList = resp.Content.ReadAsAsync<IEnumerable<Product>>().Result;
-
-            resp = WebApiUtils.WebApiClient.GetAsync("Invoice").Result;
-            var invoice = resp.Content.ReadAsAsync<IEnumerable<Invoice>>().Result.Where(i => i.InvoiceId == invoiceId).FirstOrDefault();
-
-            resp = WebApiUtils.WebApiClient.GetAsync("ProductQuantity").Result;
-            var productQuantities = resp.Content.ReadAsAsync<IEnumerable<ProductQuantity>>().Result.Where(q => q.InvoiceId == invoice.InvoiceId);
-
-            if (invoice != null)
+            if (formCollection.AllKeys.Contains("id") && formCollection.AllKeys.Contains("quantity"))
             {
-                ProductQuantity productQuantity = null;
-                for (int i = 0; i < ids.Count(); i++)
-                {
-                    int ID = -1;
-                    int quantity = -1;
-                    if (int.TryParse(ids[i], out ID) && int.TryParse(quantities[i], out quantity) && quantity > 0)
-                    {
-                        var product = productList.Where(p => p.ProductId == ID).FirstOrDefault();
-                        if (product != null)
-                        {
-                            productQuantity = productQuantities.Where(q => q.ProductId == product.ProductId).FirstOrDefault();
-                            if (productQuantity == null)
-                            {
-                                productQuantity = new ProductQuantity();
-                                productQuantity.ProductId = product.ProductId;
-                                productQuantity.Quantity = quantity;
-                                productQuantity.InvoiceId = invoice.InvoiceId;
-                                WebApiUtils.WebApiClient.PostAsJsonAsync("ProductQuantity", productQuantity);
-                            }
-                            else
-                            {
-                                productQuantity.Quantity = quantity;
-                                WebApiUtils.WebApiClient.PutAsJsonAsync("ProductQuantity/" + productQuantity.ProductQuantityId, productQuantity);
-                            }
-                        }
-                    }
-                    else if (ID >= 0)
-                    {
-                        productQuantity = productQuantities.Where(q => q.ProductId == ID).FirstOrDefault();
-                        if (productQuantity != null)
-                        {
-                            HttpResponseMessage response = WebApiUtils.WebApiClient.DeleteAsync("ProductQuantity/" + productQuantity.ProductQuantityId).Result;
-                        }
-                    }
-                }
+                string[] ids = formCollection["Id"].Split(',');
+                string[] quantities = formCollection["quantity"].Split(',');
 
-                return RedirectToAction("Details", new { id = invoiceId });
+                var resp = WebApiUtils.WebApiClient.GetAsync("Product").Result;
+                var productList = resp.Content.ReadAsAsync<IEnumerable<Product>>().Result;
+
+                resp = WebApiUtils.WebApiClient.GetAsync("Invoice").Result;
+                var invoice = resp.Content.ReadAsAsync<IEnumerable<Invoice>>().Result.Where(i => i.InvoiceId == invoiceId).FirstOrDefault();
+
+                resp = WebApiUtils.WebApiClient.GetAsync("ProductQuantity").Result;
+                var productQuantities = resp.Content.ReadAsAsync<IEnumerable<ProductQuantity>>().Result.Where(q => q.InvoiceId == invoice.InvoiceId);
+
+                if (invoice != null)
+                {
+                    ProductQuantity productQuantity = null;
+                    for (int i = 0; i < ids.Count(); i++)
+                    {
+                        int ID = -1;
+                        int quantity = -1;
+                        if (int.TryParse(ids[i], out ID) && int.TryParse(quantities[i], out quantity) && quantity > 0)
+                        {
+                            var product = productList.Where(p => p.ProductId == ID).FirstOrDefault();
+                            if (product != null)
+                            {
+                                productQuantity = productQuantities.Where(q => q.ProductId == product.ProductId).FirstOrDefault();
+                                if (productQuantity == null)
+                                {
+                                    productQuantity = new ProductQuantity();
+                                    productQuantity.ProductId = product.ProductId;
+                                    productQuantity.Quantity = quantity;
+                                    productQuantity.InvoiceId = invoice.InvoiceId;
+                                    WebApiUtils.WebApiClient.PostAsJsonAsync("ProductQuantity", productQuantity);
+                                }
+                                else
+                                {
+                                    productQuantity.Quantity = quantity;
+                                    WebApiUtils.WebApiClient.PutAsJsonAsync("ProductQuantity/" + productQuantity.ProductQuantityId, productQuantity);
+                                }
+                            }
+                        }
+                        else if (ID >= 0)
+                        {
+                            productQuantity = productQuantities.Where(q => q.ProductId == ID).FirstOrDefault();
+                            if (productQuantity != null)
+                            {
+                                HttpResponseMessage response = WebApiUtils.WebApiClient.DeleteAsync("ProductQuantity/" + productQuantity.ProductQuantityId).Result;
+                            }
+                        }
+                    }
+
+                    return RedirectToAction("Details", new { id = invoiceId });
+                }
             }
 
             return RedirectToAction("Index");
