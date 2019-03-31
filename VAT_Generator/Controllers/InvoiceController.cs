@@ -62,11 +62,17 @@ namespace VAT_Generator.Controllers
 
             HttpResponseMessage resp = WebApiUtils.WebApiClient.GetAsync("Product").Result;
             var products = resp.Content.ReadAsAsync<IEnumerable<Product>>().Result;
-            
+
             var ProductQuantityViewModel = from p in products
                                            join q in quantities on p.ProductId equals q.ProductId into pq
                                            from q in pq.DefaultIfEmpty()
                                            select new ProductQuantityViewModel { ProductQuantity = q, Product = p };
+
+
+            //var ProductQuantityViewModel = from q in quantities.DefaultIfEmpty()
+            //                           join p in products on q.ProductId equals p.ProductId
+            //                           select new ProductQuantityViewModel { ProductQuantity = q, Product = p };
+
 
             ViewData["InvoiceId"] = id;
             return View(ProductQuantityViewModel);
@@ -113,12 +119,12 @@ namespace VAT_Generator.Controllers
                                     productQuantity.ProductId = product.ProductId;
                                     productQuantity.Quantity = quantity;
                                     productQuantity.InvoiceId = invoice.InvoiceId;
-                                    WebApiUtils.WebApiClient.PostAsJsonAsync("ProductQuantity", productQuantity);
+                                    HttpResponseMessage response = WebApiUtils.WebApiClient.PostAsJsonAsync("ProductQuantity", productQuantity).Result;
                                 }
                                 else
                                 {
                                     productQuantity.Quantity = quantity;
-                                    WebApiUtils.WebApiClient.PutAsJsonAsync("ProductQuantity/" + productQuantity.ProductQuantityId, productQuantity);
+                                    HttpResponseMessage response = WebApiUtils.WebApiClient.PutAsJsonAsync("ProductQuantity/" + productQuantity.ProductQuantityId, productQuantity).Result;
                                 }
                             }
                         }

@@ -15,9 +15,10 @@ namespace WebApi.Models
         public int ProductQuantityId { get; set; }
         public int Quantity { get; set; }
 
-
+        [Required]
         public virtual int ProductId { get; set; }
         public virtual Product Product { get; set; }
+        [Required]
         public virtual int InvoiceId { get; set; }
         public virtual Invoice Invoice { get; set; }
     }

@@ -30,7 +30,7 @@
             </thead>
             <tbody>
                 @{
-                    var items = Model.Where(m => m.ProductQuantity != null && m.ProductQuantity.Quantity > 0);
+                    var items = Model.Where(m => m.ProductQuantity != null && m.ProductQuantity.Quantity > 0).OrderBy(m => m.ProductQuantity.ProductQuantityId);
                     if (items.Count() > 0)
                     {
                         foreach (VAT_Generator.Models.ProductQuantityViewModel item in items)
@@ -40,12 +40,11 @@
                                 <td>@item.Product.Name</td>
                                 <td>@item.Product.NetPrice</td>
                                 <td>@item.Product.GrossPrice</td>
-                                <td><input type="number" name="quantity" value="@(@item.ProductQuantity != null ? @item.ProductQuantity.Quantity : 0)" min="0" /></td>
+                                <td><input type="number" name="quantity" value="@item.ProductQuantity.Quantity" min="0" /></td>
                                 <td><input type="button" onclick="Remove(this)" value="Usuń"/></td>
                             </tr>
                             }
                         }
-
                     }
             </tbody>
             <tfoot>
