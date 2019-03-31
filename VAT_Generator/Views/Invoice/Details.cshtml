@@ -3,11 +3,13 @@
     ViewBag.Title = "Details";
 }
 
-
-@Html.Partial("_InvoiceDetails", Model)
-
+<div>
+    @Html.Partial("_InvoiceDetails", Model)
+</div>
 @Html.ActionLink("Pobierz jako PDF", "SaveAsPdf", new { id = Model.InvoiceId }, new { target = "_blank" })
-
+<div>
+    @Html.ActionLink("Edytuj listę produktów", "EditProducts", new { id = Model.InvoiceId })
+</div>
 <div style="margin: 20px 0 0 0">
     @Html.ActionLink("Powrót do listy", "Index")
 </div>

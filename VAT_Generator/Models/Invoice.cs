@@ -10,12 +10,13 @@ namespace VAT_Generator.Models
     {
         [Key]
         public int InvoiceId { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Pole nie może być puste.")]
         public string CustomerName { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Pole nie może być puste.")]
         public string Address { get; set; }
-        [Required]
-        [StringLength(10)]
+        [Required(ErrorMessage = "Pole nie może być puste.")]
+        [StringLength(10, MinimumLength = 10, ErrorMessage = "Numer NIP musi składać się z dziesięciu cyfr.")]
+        [RegularExpression("^[0-9]*$", ErrorMessage = "Numer NIP musi składać się z dziesięciu cyfr.")]
         public string NIP { get; set; }
         [Required]
         public DateTime CreationDate { get; set; }

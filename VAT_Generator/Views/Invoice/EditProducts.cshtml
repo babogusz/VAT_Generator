@@ -15,8 +15,10 @@
 <body>
     <h2>Lista produktów - faktura nr @ViewData["InvoiceId"]</h2>
 
-    @using (Html.BeginForm("AddProducts", "Invoice", new { invoiceId = ViewData["InvoiceId"] }, FormMethod.Post))
+    @using (Html.BeginForm("AddOrEditProducts", "Invoice", new { invoiceId = ViewData["InvoiceId"] }, FormMethod.Post))
     {
+        @Html.AntiForgeryToken()
+
         <table id="tblProducts" class="table">
             <thead>
                 <tr>
@@ -41,11 +43,11 @@
                                 <td>@item.Product.NetPrice</td>
                                 <td>@item.Product.GrossPrice</td>
                                 <td><input type="number" name="quantity" value="@item.ProductQuantity.Quantity" min="0" /></td>
-                                <td><input type="button" onclick="Remove(this)" value="Usuń"/></td>
+                                <td><input type="button" onclick="Remove(this)" value="Usuń" /></td>
                             </tr>
-                            }
                         }
                     }
+                }
             </tbody>
             <tfoot>
                 <tr>
@@ -66,13 +68,13 @@
                         }
 
                         @Html.DropDownList("dropDownProduct", listProducts, "Wybierz produkt", new {
-                            onchange = @"selectionChanged(this);", style="height: 26px"
-                            })
+                       onchange = @"selectionChanged(this);", style="height: 26px"
+                   })
                     </td>
                     <td id="lblNetPrice"></td>
                     <td id="lblGrossPrice"></td>
                     <td>
-                        <input id="numberQuantity" type="number" min="0" step="1" value="0" />
+                        <input id="numberQuantity" type="number" min="0" step="1" value="1" />
                     </td>
                     <td><input type="button" id="btnAdd" value="Dodaj" /></td>
                 </tr>
@@ -93,11 +95,11 @@
         let numberQuantity = $("#numberQuantity");
 
         if (dropDownProduct[0].selectedIndex < 1) {
-            alert("Wybierz produkt z listy");
+            showTooltip(dropDownProduct, "Wybierz produkt z listy.");
         }
         else {
             if (numberQuantity.val() < 1) {
-                alert("Ilość musi być większa niż 0.");
+                showTooltip(numberQuantity, "Ilość musi być większa od 0.");
             }
             else {
                 let selectedProduct = dropDownProduct[0].children[dropDownProduct[0].selectedIndex];
@@ -200,5 +202,13 @@
 
         cell = $(row.cells[2]);
         cell.html(productGrossPrice);
+    }
+
+    function showTooltip(element, message) {
+        element.tooltip("hide").attr('data-original-title', message).tooltip("show");
+        setTimeout(function () {
+            element.tooltip("hide");
+            element.attr('data-original-title', "")
+        }, 6000);
     }
 </script>

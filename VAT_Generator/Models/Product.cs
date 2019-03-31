@@ -12,19 +12,24 @@ namespace VAT_Generator.Models
     {
         [DisplayName("ID")]
         public int ProductId { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Pole nie może być puste.")]
         [DisplayName("Nazwa produktu")]
         public string Name { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Pole nie może być puste.")]
         [DisplayName("Cena netto [zł]")]
+
         public decimal NetPrice { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Pole nie może być puste.")]
         [DisplayName("Stawka podatku [%]")]
+
         public int TaxRate { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Pole nie może być puste.")]
         [DisplayName("Wartość podatku [zł]")]
+
         public decimal TaxValue { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Pole nie może być puste.")]
         [DisplayName("Cena brutto [zł]")]
         public decimal GrossPrice { get; set; }
         

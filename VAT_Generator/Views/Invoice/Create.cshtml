@@ -4,6 +4,15 @@
     ViewBag.Title = "Create";
 }
 
+<head>
+    <style>
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+        }
+    </style>
+</head>
+
 <h2>Nowa faktura</h2>
 <h3>Dane kupującego</h3>
 
@@ -17,7 +26,7 @@
         <div class="form-group">
             <label class="control-label col-md-2">Nazwa</label>
             <div class="col-md-10">
-                @Html.EditorFor(model => model.CustomerName, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                @Html.EditorFor(model => model.CustomerName, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.CustomerName, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -25,7 +34,7 @@
         <div class="form-group">
             <label class="control-label col-md-2">Adres</label>
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -33,7 +42,7 @@
         <div class="form-group">
             <label class="control-label col-md-2">NIP</label>
             <div class="col-md-10">
-                @Html.EditorFor(model => model.NIP, new { htmlAttributes = new { @class = "form-control", @required = "required", @maxlength = "10", @minlength = "10" } })
+                @Html.EditorFor(model => model.NIP, new { htmlAttributes = new { @class = "form-control", @type = "text", @maxlength = "10" } })
                 @Html.ValidationMessageFor(model => model.NIP, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -45,7 +54,10 @@
         </div>
     </div>
 }
-
 <div>
     @Html.ActionLink("Powrót do listy", "Index")
 </div>
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

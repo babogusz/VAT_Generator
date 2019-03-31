@@ -68,19 +68,13 @@ namespace VAT_Generator.Controllers
                                            from q in pq.DefaultIfEmpty()
                                            select new ProductQuantityViewModel { ProductQuantity = q, Product = p };
 
-
-            //var ProductQuantityViewModel = from q in quantities.DefaultIfEmpty()
-            //                           join p in products on q.ProductId equals p.ProductId
-            //                           select new ProductQuantityViewModel { ProductQuantity = q, Product = p };
-
-
             ViewData["InvoiceId"] = id;
             return View(ProductQuantityViewModel);
         }
 
 
         [HttpPost]
-        public ActionResult AddProducts(int invoiceId, FormCollection formCollection)
+        public ActionResult AddOrEditProducts(int invoiceId, FormCollection formCollection)
         {
             var resp = WebApiUtils.WebApiClient.GetAsync("Invoice").Result;
             var invoice = resp.Content.ReadAsAsync<IEnumerable<Invoice>>().Result.Where(i => i.InvoiceId == invoiceId).FirstOrDefault();
