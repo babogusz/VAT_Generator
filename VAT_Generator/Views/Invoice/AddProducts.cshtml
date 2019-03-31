@@ -74,22 +74,36 @@
         if (dropDownProduct[0].selectedIndex < 1) {
             alert("Wybierz produkt z listy");
         }
+        else if (numberQuantity.val() < 1) {
+            alert("Ilość musi być większa niż 0.");
+        }
         else {
-            if (numberQuantity.val() < 1) {
-                alert("Ilość musi być większa niż 0.");
+            let selectedProduct = dropDownProduct[0].children[dropDownProduct[0].selectedIndex];
+            let productName = selectedProduct.text;
+            let productProps = selectedProduct.value.split(";");
+            let productId = productProps[0];
+            let productNetPrice = productProps[1];
+            let productGrossPrice = productProps[2];
+
+            //Cells
+            let tBody = $("#tblProducts > TBODY")[0];
+
+            //Search for duplicate row
+            let createNewRow = true;
+            if (tBody.rows.length > 0) {
+                for (i = 0; i < tBody.rows.length; i++) {
+                    let currRow = tBody.rows[i];
+                    let idInput = currRow.firstElementChild.firstElementChild;
+                    if (idInput.value == productId) {
+                        var row = currRow;
+                        createNewRow = false;
+                        break;
+                    }
+                }
             }
-            else {
-                let selectedProduct = dropDownProduct[0].children[dropDownProduct[0].selectedIndex];
-                let productName = selectedProduct.text;
-                let productProps = selectedProduct.value.split(";");
-                let productId = productProps[0];
-                let productNetPrice = productProps[1];
-                let productGrossPrice = productProps[2];
 
-                //Cells
-                let tBody = $("#tblProducts > TBODY")[0];
-                var row = tBody.insertRow(-1);
-
+            if (createNewRow) {
+                let row = tBody.insertRow(-1);
                 let hiddenCell = document.createElement("td");
                 let idInput = document.createElement("input");
                 idInput.type = "hidden";
@@ -124,11 +138,15 @@
                 btnRemove.attr("onclick", "Remove(this);");
                 btnRemove.val("Usuń");
                 cell.append(btnRemove);
-
-                //Clear
-                dropDownProduct[0].selectedIndex = 0;
-                numberQuantity.val(0);
             }
+            else {
+                let quantityInput = row.cells[4].firstElementChild;
+                quantityInput.value = Number(quantityInput.value) + Number(numberQuantity.val());
+            }
+
+            //Clear
+            dropDownProduct[0].selectedIndex = 0;
+            numberQuantity.val(0);
         }
     });
 
@@ -142,16 +160,16 @@
     function selectionChanged(selectedProduct) {
         let dropDownProduct = $("#dropDownProduct");
 
-        if (dropDownProduct[0].selectedIndex < 0) {
-            var productNetPrice = null;
-            var productGrossPrice = null;
+        if (dropDownProduct[0].selectedIndex < 1) {
+            var productNetPrice = "";
+            var productGrossPrice = "";
         }
         else {
             var productProps = selectedProduct.value.split(";");
             var productNetPrice = productProps[1];
             var productGrossPrice = productProps[2];
         }
-        //Cells
+
         let tFooter = $("#tblProducts > TFOOT")[0];
         let row = tFooter.rows[0];
 
@@ -162,5 +180,4 @@
         cell.html(productGrossPrice);
     }
 </script>
-
 

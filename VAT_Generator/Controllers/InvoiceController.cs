@@ -62,12 +62,12 @@ namespace VAT_Generator.Controllers
 
             HttpResponseMessage resp = WebApiUtils.WebApiClient.GetAsync("Product").Result;
             var products = resp.Content.ReadAsAsync<IEnumerable<Product>>().Result;
-
-            var ProductQuantityViewModel = from p in products
-                                   join q in quantities on p.ProductId equals q.ProductId into pq
-                                   from q in pq.DefaultIfEmpty()
-                                   select new ProductQuantityViewModel { ProductQuantity = q, Product = p };
             
+            var ProductQuantityViewModel = from p in products
+                                           join q in quantities on p.ProductId equals q.ProductId into pq
+                                           from q in pq.DefaultIfEmpty()
+                                           select new ProductQuantityViewModel { ProductQuantity = q, Product = p };
+
             ViewData["InvoiceId"] = id;
             return View(ProductQuantityViewModel);
         }
@@ -76,28 +76,32 @@ namespace VAT_Generator.Controllers
         [HttpPost]
         public ActionResult AddProducts(int invoiceId, FormCollection formCollection)
         {
+            var resp = WebApiUtils.WebApiClient.GetAsync("Invoice").Result;
+            var invoice = resp.Content.ReadAsAsync<IEnumerable<Invoice>>().Result.Where(i => i.InvoiceId == invoiceId).FirstOrDefault();
+
+            resp = WebApiUtils.WebApiClient.GetAsync("ProductQuantity").Result;
+            var productQuantities = resp.Content.ReadAsAsync<IEnumerable<ProductQuantity>>().Result.Where(q => q.InvoiceId == invoice.InvoiceId);
+            
+
             if (formCollection.AllKeys.Contains("id") && formCollection.AllKeys.Contains("quantity"))
             {
-                string[] ids = formCollection["Id"].Split(',');
-                string[] quantities = formCollection["quantity"].Split(',');
+                string[] stringIds = formCollection["id"].Split(',');
+                string[] stringQuantities = formCollection["quantity"].Split(',');
 
-                var resp = WebApiUtils.WebApiClient.GetAsync("Product").Result;
+                var ids = stringIds.Select(int.Parse).ToList();
+                var quantities = stringQuantities.Select(int.Parse).ToList();
+
+                resp = WebApiUtils.WebApiClient.GetAsync("Product").Result;
                 var productList = resp.Content.ReadAsAsync<IEnumerable<Product>>().Result;
-
-                resp = WebApiUtils.WebApiClient.GetAsync("Invoice").Result;
-                var invoice = resp.Content.ReadAsAsync<IEnumerable<Invoice>>().Result.Where(i => i.InvoiceId == invoiceId).FirstOrDefault();
-
-                resp = WebApiUtils.WebApiClient.GetAsync("ProductQuantity").Result;
-                var productQuantities = resp.Content.ReadAsAsync<IEnumerable<ProductQuantity>>().Result.Where(q => q.InvoiceId == invoice.InvoiceId);
 
                 if (invoice != null)
                 {
                     ProductQuantity productQuantity = null;
                     for (int i = 0; i < ids.Count(); i++)
                     {
-                        int ID = -1;
-                        int quantity = -1;
-                        if (int.TryParse(ids[i], out ID) && int.TryParse(quantities[i], out quantity) && quantity > 0)
+                        int ID = ids[i];
+                        int quantity = quantities[i];
+                        if (quantity > 0)
                         {
                             var product = productList.Where(p => p.ProductId == ID).FirstOrDefault();
                             if (product != null)
@@ -128,8 +132,19 @@ namespace VAT_Generator.Controllers
                         }
                     }
 
+                    var quantitiesToRemove = productQuantities.Where(p => !ids.Any(i => i == p.ProductId));
+                    foreach (var quantity in quantitiesToRemove)
+                    {
+                        HttpResponseMessage response = WebApiUtils.WebApiClient.DeleteAsync("ProductQuantity/" + quantity.ProductQuantityId).Result;
+                    }
+
                     return RedirectToAction("Details", new { id = invoiceId });
                 }
+            }
+
+            foreach (var quantity in productQuantities)
+            {
+                HttpResponseMessage response = WebApiUtils.WebApiClient.DeleteAsync("ProductQuantity/" + quantity.ProductQuantityId).Result;
             }
 
             return RedirectToAction("Index");
